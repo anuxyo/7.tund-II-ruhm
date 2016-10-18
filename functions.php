@@ -1,6 +1,6 @@
 <?php
 
-	require("../../../config.php");
+	require("../../config.php");
 	// functions.php
 	//var_dump($GLOBALS);
 	
@@ -14,7 +14,7 @@
 	
 	function signUp ($email, $password) {
 		
-		$database = "if16_romil";
+		$database = "if16_anusada_2";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
 
 		$stmt = $mysqli->prepare("INSERT INTO user_sample (email, password) VALUES (?, ?)");
@@ -39,7 +39,7 @@
 		
 		$error = "";
 		
-		$database = "if16_romil";
+		$database = "if16_anusada_2";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
 
 		$stmt = $mysqli->prepare("
@@ -95,7 +95,7 @@
 	
 	function saveCar ($plate, $color) {
 		
-		$database = "if16_romil";
+		$database = "if16_anusada_2";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
 
 		$stmt = $mysqli->prepare("INSERT INTO cars_and_colors (plate, color) VALUES (?, ?)");
@@ -118,7 +118,7 @@
 	
 	function getAllCars() {
 		
-		$database = "if16_romil";
+		$database = "if16_anusada_2";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
 		
 		$stmt = $mysqli->prepare("
@@ -168,7 +168,7 @@
 	
 	function saveInterest ($interest) {
 		
-		$database = "if16_romil";
+		$database = "if16_anusada_2";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
 
 		$stmt = $mysqli->prepare("INSERT INTO interests (interest) VALUES (?)");
@@ -190,7 +190,7 @@
 	
 	function getAllInterests() {
 		
-		$database = "if16_romil";
+		$database = "if16_anusada_2";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
 		
 		$stmt = $mysqli->prepare("
@@ -225,8 +225,46 @@
 		return $result;
 	}
 	
-	
-	
+	function saveUserInterest ($interest) {
+		
+		$database = "if16_anusada_2";
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
+		
+		//et mitu korda ei saaks lisada üht hobi
+		$stmt = $mysqli->prepare("
+			SELECT id FROM user_interests
+			WHERE user_id=? AND interest_id=?
+		");
+		$stmt->bind_param("ii", $_SESSION["userId"], $interest);
+		//ei pea olema
+		$stmt->bind_result($id);
+		
+		$stmt->execute();
+		
+		if ($stmt->fetch()){
+			//kui oli olemas juba selline rida
+			echo "juba olemas";
+			//pärast return-i midagi edasi ei tehta funktsioonis
+			return;
+		}
+		
+		//vanemates php versioonides
+		//$stmt->close();
+		
+		//kui ei olnud, siis sisestan
+		$stmt = $mysqli->prepare("
+			INSERT INTO user_interests(user_id, interest_id) VALUES (?,?)");
+		
+		//näitab errorit
+		echo $mysqli->error;
+		$stmt->bind_param("ii", $_SESSION["userId"], $interest);
+		
+		if ($stmt->execute()) {
+			echo "selvestamine õnnestus";
+		} else {
+			echo "ERROR" .$stmt->error;
+		}
+	}
 	
 	
 	
